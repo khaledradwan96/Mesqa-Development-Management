@@ -26,10 +26,32 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:gri
 @media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{position:static;height:auto}.nav{grid-template-columns:repeat(4,1fr)}.sidefoot{display:none}.kpis{grid-template-columns:repeat(3,1fr)}.two,.three{grid-template-columns:1fr}}
 @media(max-width:650px){.content{padding:12px}.topbar{padding:12px}.kpis{grid-template-columns:repeat(2,1fr)}.nav{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.map{height:420px}}
 @media print{.sidebar,.topbar,.actions,.filters,.no-print{display:none!important}.app{display:block}.content{padding:0}.page{display:none}.page.active{display:block}.card,.hero{box-shadow:none}.print-only{display:block}}
-<style>
-.topmeta{display:flex;align-items:center;gap:7px;margin-inline-start:auto;margin-inline-end:10px}.live-clock{direction:ltr;font-variant-numeric:tabular-nums;background:#eef6f9;border:1px solid #d5e8ee;color:#164f67;border-radius:8px;padding:6px 10px;font-weight:700}.version-badge{background:#063b5c;color:#fff;border-radius:8px;padding:6px 10px;font-weight:800;font-size:12px}
+.topmeta{display:flex;align-items:center;gap:0;margin-inline-start:auto;margin-inline-end:10px}.version-spacer{width:22px}.live-clock{direction:ltr;white-space:nowrap;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;letter-spacing:.02em;background:#eef6f9;border:1px solid #d5e8ee;color:#164f67;border-radius:8px;padding:6px 10px;font-weight:700}.version-badge{background:#063b5c;color:#fff;border-radius:8px;padding:6px 10px;font-weight:800;font-size:12px}
 .project-cards{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px}.project-card{border:1px solid #dce7ed;border-radius:12px;background:#fff;padding:14px;box-shadow:0 8px 24px rgba(9,48,70,.08);cursor:pointer}.project-card:hover{border-color:#76b8c8}.project-card h4{margin:0 0 8px;color:#063b5c}.project-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.project-meta .metric,.project-summary .metric{background:#f6fafb;border-radius:8px;padding:8px;border:1px solid #dce7ed}.project-meta small,.project-summary small{display:block;color:#6a7b87;font-size:10px}.project-meta b,.project-summary b{display:block;margin-top:3px}.project-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.map-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px}.legend-chip{display:flex;align-items:center;gap:5px}.legend-chip i{width:12px;height:12px;border-radius:3px;display:inline-block}@media(max-width:1100px){.project-cards{grid-template-columns:1fr 1fr}.project-summary-grid{grid-template-columns:1fr 1fr}}@media(max-width:650px){.project-cards{grid-template-columns:1fr}.project-summary-grid{grid-template-columns:1fr}}
-</style></style>
+#mapCanvas{height:650px!important;min-height:650px;border-radius:12px;overflow:hidden;background:#e8f1f5;position:relative}
+#mapCanvas .leaflet-container{font-family:inherit;height:100%;width:100%}
+.gov-label{font-weight:700;font-size:11px;color:#243b45;text-shadow:0 1px 3px #fff,0 -1px 3px #fff,1px 0 3px #fff,-1px 0 3px #fff;white-space:nowrap}
+.map-info-card{font-family:inherit;direction:rtl;min-width:230px}
+.map-info-card h4{margin:0 0 7px;color:#063b5c}
+.map-toolbar-note{font-size:11px;color:#657781;margin-top:7px}
+</style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<style id="gis-stability-css">
+#mapCanvas{height:680px!important;min-height:680px;width:100%;border-radius:12px;overflow:hidden;background:#e8f1f5;position:relative}
+#mapCanvas .leaflet-container{height:100%!important;width:100%!important;background:#e8f1f5;font-family:inherit;touch-action:pan-x pan-y}
+#mapCanvas .leaflet-control{z-index:800}
+#mapCanvas .leaflet-top,#mapCanvas .leaflet-bottom{z-index:800}
+.leaflet-popup-content-wrapper{border-radius:10px}
+.leaflet-popup-content{margin:12px 14px;line-height:1.8}
+.gov-label{font-weight:700;font-size:11px;color:#243b45;text-shadow:0 1px 3px #fff,0 -1px 3px #fff,1px 0 3px #fff,-1px 0 3px #fff;white-space:nowrap}
+.map-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(244,250,252,.88);z-index:1200;font-weight:700;color:#164f67}
+.map-status{position:absolute;bottom:12px;right:12px;z-index:1000;background:rgba(255,255,255,.94);border:1px solid #d9e5ea;border-radius:8px;padding:7px 10px;font-size:11px;color:#45606b;box-shadow:0 3px 12px rgba(0,0,0,.08)}
+@media(max-width:900px){#mapCanvas{height:560px!important;min-height:560px}}
+@media(max-width:600px){#mapCanvas{height:470px!important;min-height:470px}.leaflet-control-layers{max-width:180px}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -42,7 +64,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:gri
 </aside>
 <main class="main">
 <header class="topbar"><div class="crumb" id="crumb">لوحة القيادة</div>
-<div class="topmeta"><span class="live-clock" id="liveClock">--:--:--</span><span class="version-badge">V1.1</span></div>
+<div class="topmeta"><span class="live-clock" id="liveClock"></span><span class="version-spacer"></span><span class="version-badge">V1.2</span></div>
 <div class="actions no-print"><button class="btn primary" id="importBtn">استيراد Excel</button><button class="btn" id="exportBtn">تصدير JSON</button><button class="btn" id="printBtn">طباعة التقرير</button></div></header>
 <div class="content">
 <section id="dashboard" class="page active">
@@ -58,7 +80,24 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:gri
 <div class="badge">Offline • اضغط على الطبقة</div></div><div class="map" id="mapCanvas"></div></div>
 <div class="section-title"><h3>ملخص المشروع المحدد</h3><span class="badge">تكلفة + زمام + GIS</span></div>
 <div id="mapProjectSummary" class="card"><div class="empty">اختر مشروعًا من القائمة أو اضغط على طبقة GIS.</div></div>
-<div class="section-title"><h3>المشروعات المسجلة</h3></div><div id="projectCards" class="project-cards"></div><div class="notice" style="margin-top:12px">ملاحظة: حدود مصر في الخلفية مرجعية مبسطة، بينما مضلعات مشروعات IIP1 وIIP2 وIIIMP معروضة من ملفات KMZ المرفقة فعليًا. لا يتم اعتبار مساحة المضلع GIS بديلًا عن زمام الحصر إلا بعد اعتماد العلاقة رسميًا.</div></section>
+<div class="section-title"><h3>المشروعات المسجلة</h3></div><div id="projectCards" class="project-cards"></div><div class="section-title"><h3>محرك ربط GIS – Excel – Google Drive</h3><span class="badge">V1.5 Architecture</span></div>
+<div class="card">
+  <div class="project-summary-grid">
+    <div class="metric"><small>مصدر البيانات</small><b>Excel / Google Sheet</b></div>
+    <div class="metric"><small>معرّف الربط</small><b>كود المنطقة</b></div>
+    <div class="metric"><small>ملف GIS</small><b>KML / KMZ</b></div>
+    <div class="metric"><small>المخزن السحابي</small><b>Google Drive</b></div>
+  </div>
+  <div class="notice" style="margin-top:12px;line-height:1.9">
+    <b>منهجية الربط:</b> يتم ربط كل سجل حصر بكود المنطقة، ثم البحث عن رابط KML/KMZ المقابل له في Google Drive.
+    عند تشغيل التطبيق Offline تُستخدم طبقة GIS المحلية المضمنة/المخزنة مؤقتًا، بينما عند توفر الاتصال يمكن تحديث الطبقات من المصدر السحابي.
+    <br><b>ملاحظة:</b> النسخة الحالية تضع المعمارية داخل التطبيق، أما الجلب المباشر من Google Drive فيتطلب صلاحيات وصول وآلية API مناسبة للملفات.
+  </div>
+  <div class="toolbar" style="margin-top:12px">
+    <button class="btn primary" onclick="alert('محرك الربط: الخطوة التالية هي بناء مستورد روابط Drive وقراءة KML/KMZ وربطها تلقائيًا بكود المنطقة.')">تشغيل فحص الربط</button>
+    <button class="btn" onclick="alert('سيتم في المرحلة التالية إنشاء سجل GIS Registry يوضح: كود المنطقة، رابط Drive، اسم الملف، آخر تحديث، وحالة الطبقة المحلية.')">GIS Registry</button>
+  </div>
+</div><div class="notice" style="margin-top:12px">ملاحظة: حدود مصر في الخلفية مرجعية مبسطة، بينما مضلعات مشروعات IIP1 وIIP2 وIIIMP معروضة من ملفات KMZ المرفقة فعليًا. لا يتم اعتبار مساحة المضلع GIS بديلًا عن زمام الحصر إلا بعد اعتماد العلاقة رسميًا.</div></section>
 <section id="regions" class="page"><div class="section-title"><h3>مناطق التطوير</h3></div><div class="toolbar"><div class="filters"><input id="regionSearch" placeholder="بحث بالكود أو الاسم أو المحافظة"><select id="regionGov"><option value="all">كل المحافظات</option></select><select id="regionType"><option value="all">كل أنواع التطوير</option></select></div><button class="btn primary no-print" id="addRegion">+ إضافة منطقة</button></div><div class="card table-wrap"><table class="table"><thead><tr><th>الكود</th><th>المنطقة</th><th>المحافظة</th><th>الإدارة</th><th>المساقي</th><th>الزمام</th><th>نوع التطوير</th><th>الأولوية</th><th>إجراء</th></tr></thead><tbody id="regionsTable"></tbody></table></div></section>
 <section id="analytics" class="page"><div class="hero"><h2>مركز المؤشرات والتحليل</h2><p>المؤشرات الأصلية مأخوذة من بيانات الحصر، أما مؤشر الأولوية فهو نموذج تحليلي مقترح قابل للتعديل.</p></div><div class="grid three" id="analysisCards"></div><div class="section-title"><h3>ترتيب المناطق حسب مؤشر الأولوية المقترح</h3></div><div class="card table-wrap"><table class="table"><thead><tr><th>#</th><th>المنطقة</th><th>الزمام</th><th>نسبة الزمام غير العامل</th><th>عجز الكفاءة</th><th>نسبة المساقي غير العاملة</th><th>المؤشر</th><th>التصنيف</th></tr></thead><tbody id="analysisTable"></tbody></table></div></section>
 <section id="nonworking" class="page"><div class="section-title"><h3>المساقي غير العاملة</h3></div><div class="grid two"><div class="card"><h3>أسباب عدم العمل</h3><div id="reasonBars" class="bars"></div></div><div class="card"><h3>المناطق ذات أعلى زمام غير عامل</h3><div id="inactiveBars" class="bars"></div></div></div><div class="section-title"><h3>التفاصيل</h3></div><div class="card table-wrap"><table class="table"><thead><tr><th>المنطقة</th><th>نوع التطوير</th><th>عدد غير العامل</th><th>الزمام غير العامل</th><th>السبب</th></tr></thead><tbody id="inactiveTable"></tbody></table></div></section>
@@ -67,7 +106,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:gri
 <section id="quality" class="page"><div class="section-title"><h3>جودة البيانات</h3></div><div id="qualityBoxes" class="quality"></div><div class="section-title"><h3>التنبيهات المكتشفة</h3></div><div class="card table-wrap"><table class="table"><thead><tr><th>المستوى</th><th>المنطقة</th><th>نوع المشكلة</th><th>التفصيل</th></tr></thead><tbody id="qualityTable"></tbody></table></div></section>
 <section id="data" class="page"><div class="hero"><h2>إدارة البيانات</h2><p>النواة المستقبلية لنظام إدارة بيانات الحصر: استيراد، مراجعة، تعديل، إضافة، تصدير، وإعادة تحميل البيانات.</p></div><div class="grid three"><div class="card"><h3>استيراد من Excel</h3><p class="notice">يدعم ملف XLSX المحلي دون اتصال، ويقرأ أول ورقة ويستخدم صف العناوين كأسماء الحقول.</p><button class="btn primary" id="importBtn2">استيراد ملف Excel</button></div><div class="card"><h3>حفظ نسخة احتياطية</h3><p>احفظ قاعدة البيانات الحالية كملف JSON يمكن استعادته لاحقًا.</p><button class="btn" id="backupBtn">تصدير نسخة احتياطية</button></div><div class="card"><h3>إعادة بيانات النموذج</h3><p>إرجاع البيانات المضمنة في نسخة التطبيق الحالية.</p><button class="btn" id="resetBtn">إعادة البيانات الأصلية</button></div></div><div class="section-title"><h3>سجل البيانات</h3></div><div class="card table-wrap"><table class="table"><thead><tr><th>ID</th><th>الكود</th><th>المنطقة</th><th>المحافظة</th><th>المساقي</th><th>الزمام</th><th>تاريخ التسجيل</th><th>إجراء</th></tr></thead><tbody id="dataTable"></tbody></table></div></section>
 <section id="reports" class="page"><div class="hero"><h2>مركز التقارير</h2><p>اختر مستوى التقرير ثم اطبعه أو احفظه من نافذة الطباعة في المتصفح.</p></div><div class="card"><div class="filters"><select id="reportGov"><option value="all">كل المحافظات</option></select><select id="reportType"><option value="all">كل أنواع التطوير</option></select><button class="btn primary" id="generateReport">تحديث التقرير</button></div></div><div class="section-title"><h3>ملخص التقرير</h3></div><div id="reportOutput" class="card"></div></section>
-</div><div class="footer">وزارة الموارد المائية والري — قطاع تطوير الري | الإصدار V1.1 | نظام Offline قابل للتوسع</div>
+</div><div class="footer">وزارة الموارد المائية والري — قطاع تطوير الري | الإصدار V1.5 | محرك ربط GIS–Excel–Google Drive | نظام Offline قابل للتوسع</div>
 </main></div>
 <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" hidden>
 <div class="modal" id="modal"><div class="modalbox"><h3 id="modalTitle">إضافة منطقة</h3><div class="formgrid" id="formGrid"></div><div class="modalfoot"><button class="btn primary" id="saveModal">حفظ</button><button class="btn" id="closeModal">إلغاء</button></div></div></div>
@@ -105,23 +144,153 @@ function projectSummaryHtml(name){
  <b>أكواد المناطق:</b> ${esc(p.codes.join('، ')||'غير محددة')}</p>`;
 }
 function selectProjectOnMap(name){$('#mapProject').value=name;$('#mapProjectSummary').innerHTML=projectSummaryHtml(name);map();}
-function map(){
- let W=1000,H=600,lon0=24,lon1=37,lat0=22,lat1=32;
- const xy=p=>[(p[0]-lon0)/(lon1-lon0)*W,(lat1-p[1])/(lat1-lat0)*H];
- const path=pts=>pts.map((p,i)=>{let q=xy(p);return`${i?'L':'M'}${q[0].toFixed(1)},${q[1].toFixed(1)}`}).join(' ')+' Z';
- const outline=[[25,31.65],[30.2,31.55],[32,31.35],[34.9,31.45],[34.95,30],[35.5,29.5],[35.8,28.5],[35,27.5],[34.4,26],[34.1,24.5],[33.6,22],[31.2,22],[28.5,22],[25,22],[25.2,24],[25.1,26],[25.3,28],[24.9,30],[25,31.65]];
- const nile=[[32.9,31.1],[32.3,29.8],[31.6,29],[31.25,28],[31.1,26.5],[30.95,25],[30.8,23.5],[30.5,22]];
- const pr=$('#mapProject').value||'all',polys=state.polys.filter(p=>pr==='all'||p.project===pr),colors={IIP1:'#0b6fa4',IIP2:'#18a7b8',IIIMP:'#d58a16'};
- let svg=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"><rect width="1000" height="600" fill="#f7fbfc"/>
- <path class="outline" d="${path(outline)}"/><path d="${nile.map((p,i)=>{let q=xy(p);return`${i?'L':'M'}${q[0]},${q[1]}`}).join(' ')}" fill="none" stroke="#5ba9bc" stroke-width="4"/>
- <text x="715" y="70" class="map-label">شبه جزيرة سيناء</text><text x="420" y="330" class="map-label">وادي النيل والدلتا</text>`;
- polys.forEach(p=>svg+=`<path class="poly" fill="${colors[p.project]||'#777'}" d="${path(p.points)}" data-project="${esc(p.project)}" onclick="selectProjectOnMap(this.dataset.project)"/>`);
- svg+='</svg>';$('#mapCanvas').innerHTML=svg;$('#mapProjectSummary').innerHTML=projectSummaryHtml(pr==='all'?'':pr);
- $('#projectCards').innerHTML=(state.projectSummaries||[]).map(p=>`<div class="project-card" onclick="selectProjectOnMap('${String(p.name).replace(/'/g,"\\'")}')"><h4>${esc(p.name)}</h4>
- <span class="badge">${state.polys.some(x=>x.project===p.name)?'GIS متاح':'لا توجد طبقة مضمّنة'}</span><div class="project-meta">
- <div class="metric"><small>التكلفة</small><b>${fmt(p.fundingEgp)}</b></div><div class="metric"><small>الزمام</small><b>${fmt(p.area)} فدان</b></div>
- <div class="metric"><small>المساقي</small><b>${fmt(p.mesqas)}</b></div><div class="metric"><small>المحافظات</small><b>${esc(p.regions.join('، ')||'—')}</b></div></div></div>`).join('');
+let leafletMap=null, governorateLayer=null, projectLayer=null, governorateLabels=[];
+let mapInitialized=false, mapResizeObserver=null, mapResizeTimer=null;
+const GOV_AR={
+"Cairo":"القاهرة","Giza":"الجيزة","Alexandria":"الإسكندرية","Dakahlia":"الدقهلية","Red Sea":"البحر الأحمر",
+"Beheira":"البحيرة","Fayoum":"الفيوم","Gharbia":"الغربية","Ismailia":"الإسماعيلية","Menofia":"المنوفية",
+"Minya":"المنيا","Qalyubia":"القليوبية","New Valley":"الوادي الجديد","Suez":"السويس","Aswan":"أسوان",
+"Assiut":"أسيوط","Beni Suef":"بني سويف","Port Said":"بورسعيد","Damietta":"دمياط","Sharkia":"الشرقية",
+"South Sinai":"جنوب سيناء","Kafr el-Sheikh":"كفر الشيخ","Matrouh":"مطروح","Luxor":"الأقصر","Qena":"قنا",
+"Sohag":"سوهاج","North Sinai":"شمال سيناء"
+};
+function normalizeGov(n){const x=String(n||'').trim();return GOV_AR[x]||x.replace('Governorate','').trim();}
+function projectGeoJSON(){return {type:"FeatureCollection",features:(state.polys||[]).filter(p=>Array.isArray(p.points)&&p.points.length>=3).map((p,i)=>({type:"Feature",properties:{project:p.project||"مشروع",id:i},geometry:{type:"Polygon",coordinates:[p.points.map(q=>[Number(q[0]),Number(q[1])])]}}))};}
+function projectPopup(name){
+ const p=(state.projectSummaries||[]).find(x=>x.name===name);
+ if(!p)return `<div class="map-info-card"><h4>${esc(name)}</h4><p>لا توجد بيانات تفصيلية.</p></div>`;
+ return `<div class="map-info-card"><h4>${esc(p.name)}</h4><b>التكلفة:</b> ${fmt(p.fundingEgp)} جنيه<br><b>الزمام:</b> ${fmt(p.area)} فدان<br><b>عدد المساقي:</b> ${fmt(p.mesqas)}<br><b>المحافظات:</b> ${esc(p.regions.join('، ')||'—')}<br><b>التمويل:</b> ${esc(p.funders.join('، ')||'—')}</div>`;
 }
+function setMapStatus(txt){const e=document.getElementById('mapStatus');if(e)e.textContent=txt;}
+function scheduleMapResize(){
+ clearTimeout(mapResizeTimer);
+ mapResizeTimer=setTimeout(()=>{if(leafletMap){leafletMap.invalidateSize({pan:false,animate:false});}},120);
+}
+function installMapResizeObserver(){
+ if(mapResizeObserver||!window.ResizeObserver)return;
+ const target=document.getElementById('mapCanvas');
+ if(!target)return;
+ mapResizeObserver=new ResizeObserver(scheduleMapResize);
+ mapResizeObserver.observe(target);
+ window.addEventListener('resize',scheduleMapResize,{passive:true});
+}
+function clearGovLabels(){
+ governorateLabels.forEach(x=>{try{leafletMap.removeLayer(x)}catch(e){}});
+ governorateLabels=[];
+}
+function refreshGovLabels(){
+ if(!leafletMap||!governorateLayer)return;
+ clearGovLabels();
+ const z=leafletMap.getZoom();
+ if(z<6.8)return;
+ governorateLayer.eachLayer(layer=>{
+   const text=layer.__govName;
+   if(!text)return;
+   const c=layer.getBounds().getCenter();
+   const marker=L.marker(c,{interactive:false,keyboard:false,icon:L.divIcon({className:'',html:`<div class="gov-label">${esc(text)}</div>`,iconSize:null})});
+   marker.addTo(leafletMap);governorateLabels.push(marker);
+ });
+}
+function bindGovernorateFeature(feature,layer){
+ const props=feature.properties||{};
+ const candidates=[props.NAME_1,props.GOV_NAME,props.GOVERNORATE,props.NAME,props.name,props.Name];
+ const raw=candidates.find(v=>v!==undefined&&v!==null&&String(v).trim()) || Object.values(props).find(v=>typeof v==='string'&&v.length<40);
+ const name=normalizeGov(raw);
+ layer.__govName=name;
+ layer.bindTooltip(name,{sticky:true,direction:'center',className:'gov-label'});
+ layer.on({
+  mouseover:e=>e.target.setStyle({weight:2.8,fillOpacity:.24}),
+  mouseout:e=>{if(governorateLayer)governorateLayer.resetStyle(e.target)},
+  click:e=>{
+   const related=(state.projectSummaries||[]).filter(p=>(p.regions||[]).some(r=>String(r).includes(name)||name.includes(String(r))));
+   const html=`<div class="map-info-card"><h4>محافظة ${esc(name)}</h4><div><b>المشروعات المرتبطة:</b> ${related.length}</div>${related.slice(0,8).map(p=>`<div style="margin-top:4px">• ${esc(p.name)} — ${fmt(p.fundingEgp)} جنيه</div>`).join('')}${related.length>8?'<div>…</div>':''}</div>`;
+   layer.bindPopup(html,{maxWidth:320}).openPopup();
+  }
+ });
+}
+function buildProjectLayer(){
+ const gj=projectGeoJSON();
+ projectLayer=L.geoJSON(gj,{
+  style:f=>({color:'#ffffff',weight:1.2,fillColor:(f.properties.project==='IIP1'?'#0878a8':f.properties.project==='IIP2'?'#14a7b8':f.properties.project==='IIIMP'?'#d98b16':'#777'),fillOpacity:.52}),
+  onEachFeature:(feature,layer)=>{
+   const name=feature.properties.project;
+   layer.bindTooltip(name,{sticky:true});
+   layer.bindPopup(projectPopup(name),{maxWidth:360});
+   layer.on({click:()=>selectProjectOnMap(name),mouseover:e=>e.target.setStyle({weight:3,fillOpacity:.76}),mouseout:e=>projectLayer.resetStyle(e.target)});
+  }
+ });
+ projectLayer.addTo(leafletMap);
+}
+async function loadGovernorates(){
+ const govUrl='https://services3.arcgis.com/t6lYS2Pmd8iVx1fy/ArcGIS/rest/services/egy_bnd_admin1_govcapmas_2017/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson';
+ try{
+  const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),15000);
+  const r=await fetch(govUrl,{signal:ctrl.signal,cache:'no-store'});clearTimeout(timer);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const gj=await r.json();
+  if(!gj||!Array.isArray(gj.features))throw new Error('Invalid GeoJSON');
+  governorateLayer=L.geoJSON(gj,{style:()=>({color:'#245b70',weight:1.5,fillColor:'#6fa8b8',fillOpacity:.10}),onEachFeature:bindGovernorateFeature});
+  governorateLayer.addTo(leafletMap);
+  refreshGovLabels();
+  try{const bounds=governorateLayer.getBounds();if(bounds.isValid())leafletMap.fitBounds(bounds.pad(.035),{animate:false});}catch(e){}
+  setMapStatus('تم تحميل حدود المحافظات • اسحب للتنقل واستخدم عجلة الماوس للتكبير');
+ }catch(err){
+  console.error(err);
+  setMapStatus('تعذر تحميل طبقة المحافظات • تحقق من الاتصال بالإنترنت');
+ }
+}
+function map(){
+ const el=document.getElementById('mapCanvas');if(!el)return;
+ if(leafletMap){
+  scheduleMapResize();return;
+ }
+ // Loading overlay/status
+ if(!document.getElementById('mapLoading'))el.insertAdjacentHTML('beforeend','<div id="mapLoading" class="map-loading">جاري تجهيز الخريطة...</div>');
+ if(!document.getElementById('mapStatus'))el.insertAdjacentHTML('beforeend','<div id="mapStatus" class="map-status">جاري الاتصال بخدمات الخرائط...</div>');
+ leafletMap=L.map(el,{
+  center:[26.82,30.80],zoom:5.7,minZoom:4.5,maxZoom:18,
+  zoomControl:true,scrollWheelZoom:true,doubleClickZoom:true,boxZoom:true,keyboard:true,
+  dragging:true,tap:true,zoomAnimation:true,fadeAnimation:true,markerZoomAnimation:true,
+  preferCanvas:true
+ });
+ const osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors',crossOrigin:true});
+ const satellite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Tiles &copy; Esri'});
+ const topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'&copy; OpenTopoMap contributors'});
+ osm.addTo(leafletMap);
+ L.control.layers({"خريطة الشوارع":osm,"صور الأقمار الصناعية":satellite,"التضاريس":topo},null,{collapsed:true,position:'topright'}).addTo(leafletMap);
+ L.control.scale({imperial:false,position:'bottomleft'}).addTo(leafletMap);
+ L.control.layers(null,{}, {collapsed:true}).addTo(leafletMap); // placeholder, populated below
+
+ buildProjectLayer();
+ const overlayControl=L.control.layers(null,{"مشروعات التطوير":projectLayer},{collapsed:true,position:'topleft'}).addTo(leafletMap);
+
+ leafletMap.on('zoomend',()=>{refreshGovLabels();scheduleMapResize();});
+ leafletMap.on('moveend',scheduleMapResize);
+ leafletMap.whenReady(()=>{
+  scheduleMapResize();installMapResizeObserver();
+  setTimeout(()=>{scheduleMapResize();const l=document.getElementById('mapLoading');if(l)l.remove();},250);
+ });
+ loadGovernorates();
+
+ mapInitialized=true;
+ $('#mapProjectSummary').innerHTML=projectSummaryHtml($('#mapProject').value==='all'?'':$('#mapProject').value);
+ renderProjectCards();
+}
+function renderProjectCards(){
+ $('#projectCards').innerHTML=(state.projectSummaries||[]).map(p=>`<div class="project-card" onclick="selectProjectOnMap('${String(p.name).replace(/'/g,"\\'")}')"><h4>${esc(p.name)}</h4><span class="badge">${state.polys.some(x=>x.project===p.name)?'GIS متاح':'لا توجد طبقة مضمّنة'}</span><div class="project-meta"><div class="metric"><small>التكلفة</small><b>${fmt(p.fundingEgp)}</b></div><div class="metric"><small>الزمام</small><b>${fmt(p.area)} فدان</b></div><div class="metric"><small>المساقي</small><b>${fmt(p.mesqas)}</b></div><div class="metric"><small>المحافظات</small><b>${esc(p.regions.join('، ')||'—')}</b></div></div></div>`).join('');
+}
+function selectProjectOnMap(name){
+ $('#mapProject').value=name;$('#mapProjectSummary').innerHTML=projectSummaryHtml(name);
+ if(!leafletMap){map();return;}
+ const target=(state.polys||[]).filter(p=>p.project===name&&Array.isArray(p.points)&&p.points.length>=3);
+ if(target.length){
+  const b=L.latLngBounds([]);
+  target.forEach(p=>p.points.forEach(q=>b.extend([Number(q[1]),Number(q[0])])));
+  if(b.isValid())leafletMap.fitBounds(b.pad(.18),{animate:true,maxZoom:12});
+ }
+ if(projectLayer)projectLayer.eachLayer(l=>{if(l.feature?.properties?.project===name)l.openPopup()});
+}
+
 function report(){let g=$('#reportGov').value,t=$('#reportType').value,rs=state.rows.filter(r=>(g==='all'||r.region===g)&&(t==='all'||r.developments.some(d=>d.type===t))),a=rs.reduce((s,r)=>s+num(r.area),0),m=rs.reduce((s,r)=>s+num(r.mesqas),0);$('#reportOutput').innerHTML=`<div class="print-only"><h1>تقرير حصر المساقي المطورة — قطاع تطوير الري</h1></div><h3>${g==='all'?'جميع المحافظات':esc(g)}${t==='all'?'':' — '+esc(t)}</h3><div class="grid three"><div class="qbox"><b>${rs.length}</b><div>سجل</div></div><div class="qbox"><b>${fmt(m)}</b><div>مسقى</div></div><div class="qbox"><b>${fmt(a)}</b><div>فدان</div></div></div><hr><p>هذا التقرير يُبنى مباشرة من قاعدة البيانات الحالية. المؤشرات المشتقة توضيحية وليست بديلًا عن التقارير الرسمية المعتمدة.</p>`}
 function showPage(id){$$('.page').forEach(p=>p.classList.toggle('active',p.id===id));$$('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));$('#crumb').textContent={dashboard:'لوحة القيادة',map:'الخريطة التفاعلية',regions:'مناطق التطوير',analytics:'المؤشرات والتحليل',nonworking:'المساقي غير العاملة',energy:'الطاقة والكهرباء',finance:'التمويل والمشروعات',quality:'جودة البيانات',data:'إدارة البيانات',reports:'التقارير'}[id]}
 $$('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.go)));
@@ -139,6 +308,12 @@ function rowsMatrix(m){let h=m[0]||[];return m.slice(1).filter(r=>r.some(x=>Stri
 async function importFile(file){let m=await readXlsx(file),raw=rowsMatrix(m),known=INITIAL.rows[0],norm=raw.map((o,i)=>{let get=(k)=>o[k]??null,r={id:'IMP'+String(i+1).padStart(4,'0'),timestamp:get('Timestamp'),adminCode:get('رقم سري الإدارة'),developmentAdmin:get('الإدارة العامة للتطوير'),region:get('المحافظة'),irrigationAdmin:get('الإدارة العامة للري'),engineering:get('هندسة الري'),code:get('كود المنطقة'),name:get('اسم المنطقة'),mesqas:get('عدد المساقي المطورة'),area:get('زمام المساقي المطورة (بالفدان)'),declaredType:get('اذكر نوع التطوير'),fundingType:get('نوع التمويل'),project:get('اسم المشروع'),funder:get('جهة التمويل'),fundingEgp:get('قيمة التمويل بالجنيه المصري'),foreignFunding:get('القيمة بالعملة الأجنبية'),gisLink:get('ارفاق ملف KML الخاص بالمنطقة'),developments:[]};known.developments.forEach(d=>r.developments.push({...d,count:null,area:null,efficiency:null,inactiveCount:null,inactiveArea:null}));return r});state.rows=norm;state.meta.rows=norm.length;saveLocal();render();alert(`تم استيراد ${norm.length} سجلًا من ${file.name}`)}
 $('#importBtn').onclick=$('#importBtn2').onclick=()=>$('#fileInput').click();$('#fileInput').onchange=e=>{let f=e.target.files[0];if(f)importFile(f).catch(err=>alert('تعذر الاستيراد: '+err.message))};
 function render(){populate();dashboard();regions();analytics();inactive();energy();finance();quality();dataTable();map();report()}
-function updateClock(){const n=new Date();$("#liveClock").textContent=new Intl.DateTimeFormat("ar-EG",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(n)}setInterval(updateClock,1000);updateClock();loadLocal();render();
+function updateClock(){
+ const n=new Date();
+ const d=new Intl.DateTimeFormat('ar-EG',{day:'numeric',month:'long',year:'numeric'}).format(n);
+ const t=new Intl.DateTimeFormat('ar-EG',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).format(n);
+ $('#liveClock').textContent=`${d} - ${t}`;
+}
+setInterval(updateClock,1000);updateClock();loadLocal();render();
 </script>
 </body></html>
